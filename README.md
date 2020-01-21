@@ -14,11 +14,11 @@ The basic command to clone one or more repositories would be:
 $ rlcone user/repo other_user/other_repo
 ```
 
-Alternatively, a default GitHub ID may be set up using:
+A default GitHub ID may be set up using:
 ```
 $ rclone --set-default your_default_ID
 ```
-It allows for directly cloning without specifying the repository's owner ID:
+This allows for directly cloning without specifying the repository's owner ID (useful for one's own repos)
 ```
 $ rclone repo
 ```
