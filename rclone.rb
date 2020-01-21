@@ -24,9 +24,13 @@ if ARGV.include?("--help") || ARGV.length < 1
   puts "       rclone REPOSITORY...                 Use the default GitHub ID"
   puts "       rclone --set-default GITHUB-ID       Set the default GitHub ID"
   puts "       rclone --help                        Display this help"
-  puts "Clone one or more repository(ies) from GitHub"
+  puts "Clone one or more repositories from GitHub"
   exit
 end
+
+GIT_ERROR_MSG = "# ERROR: 'git' command failed.\nConsider checking for "       \
+    "correct installation of the 'git' package. Refer to your distribution's " \
+    "package manager for further installation details."
 
 # The configuration file uses the standard $HOME/.config/ directory and contains
 # nothing more than the default GitHub ID
@@ -36,29 +40,41 @@ CONFIG_PATH = File.join(CONFIG_DIR, "config")
 # Check the existence of the $HOME/.config/rclone/ directory
 Dir.mkdir(CONFIG_DIR) if !Dir.exist?(CONFIG_DIR)
 
-i = 0
-while i < ARGV.length do
+ARGV.each_with_index do |arg, index|
   # Set default GitHub ID if asked and exit
-  if ARGV[i] == "--set-default"
-    File.open(CONFIG_PATH, "w") { |f| f.write(ARGV[i + 1]) }
-    puts "The default GitHub ID has been set to: '" + ARGV[i + 1] + "'"
+  if arg == "--set-default"
+    File.open(CONFIG_PATH, "w") { |f| f.write(ARGV[index + 1]) }
+    puts "The default GitHub ID has been set to: '" + ARGV[index + 1] + "'"
     exit
   end
-  
+
   # Clone current repository
-  if ARGV[i].include?("/")
-    system("git", "clone", "https://github.com/" + ARGV[i])
+  if arg.include?("/")
+    puts "Cloning from '" + arg + "'"
+    begin
+      if system("git clone https://github.com/" + arg) == nil
+        puts GIT_ERROR_MSG
+      end
+    rescue Interrupt => e
+      puts "\n# WARNING: cloning interrupted."
+    end
   else
     # Prompt for a default GitHub ID if it doesn't exist yet
     if File.exist?(CONFIG_PATH)
-      githubID = File.read(CONFIG_PATH)
+      github_id = File.read(CONFIG_PATH)
     else
       puts "No default ID found, please enter a default GitHub ID..."
-      githubID = STDIN.gets.chomp
-      File.open(CONFIG_PATH, "w") { |f| f.write(githubID) }
-      puts "Default GitHub ID has been set to: '" + githubID + "'"
+      github_id = STDIN.gets.chomp
+      File.open(CONFIG_PATH, "w") { |f| f.write(github_id) }
+      puts "Default GitHub ID set to: '" + github_id + "'"
     end
-    system("git", "clone", "https://github.com/" + githubID + "/" + ARGV[i])
+    puts "Cloning from '" + github_id + "/" + arg + "'"
+    begin
+      if system("git clone https://github.com/" + github_id + "/" + arg) == nil
+        puts GIT_ERROR_MSG
+      end
+    rescue Interrupt => e
+      puts "\n# WARNING: cloning interrupted."
+    end
   end
-  i += 1
 end
