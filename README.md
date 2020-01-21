@@ -1,5 +1,5 @@
 # RClone
-A minimal "git clone" shortcut written in Ruby
+A minimal "git clone" shortcut written in Ruby.
 
 ## Installation
 To direclty install RClone systemwide, clone this repository (without RClone :p) and use the provided `install.sh` script:
@@ -9,9 +9,9 @@ $ sh install.sh
 ```
 
 ## Usage
-The basic command to clone https://github.com/user/repo would be:
+The basic command to clone one or more repositories would be:
 ```
-$ rlcone user/repo
+$ rlcone user/repo other_user/other_repo
 ```
 
 Alternatively, a default GitHub ID may be set up using:
