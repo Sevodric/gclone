@@ -24,57 +24,66 @@ if ARGV.include?("--help") || ARGV.length < 1
   puts "       rclone REPOSITORY...                 Use the default GitHub ID"
   puts "       rclone --set-default GITHUB-ID       Set the default GitHub ID"
   puts "       rclone --help                        Display this help"
-  puts "Clone one or more repositories from GitHub"
+  puts "\nClone one or more repositories from GitHub"
   exit
 end
 
-GIT_ERROR_MSG = "# ERROR: 'git' command failed.\nConsider checking for "       \
-    "correct installation of the 'git' package. Refer to your distribution's " \
-    "package manager for further installation details."
+GIT_ERROR_MSG = "*** ERROR: 'git' nor found.\nConsider checking for correct "  \
+    "installation of the 'git' package. Refer to your distribution's package " \
+    "manager for further installation details."
 
 # The configuration file uses the standard $HOME/.config/ directory and contains
 # nothing more than the default GitHub ID
 CONFIG_DIR = File.join(Dir.home, ".config", "rclone")
 CONFIG_PATH = File.join(CONFIG_DIR, "config")
 
-# Check the existence of the $HOME/.config/rclone/ directory
+# Ensure the "~/.config/rclone/" directory does exist
 Dir.mkdir(CONFIG_DIR) if !Dir.exist?(CONFIG_DIR)
 
+# Main loop
 ARGV.each_with_index do |arg, index|
+
   # Set default GitHub ID if asked and exit
   if arg == "--set-default"
     File.open(CONFIG_PATH, "w") { |f| f.write(ARGV[index + 1]) }
-    puts "The default GitHub ID has been set to: '" + ARGV[index + 1] + "'"
+    puts "Default GitHub ID set to: '#{ARGV[index + 1]}'"
     exit
   end
 
-  # Clone current repository
-  if arg.include?("/")
-    puts "Cloning from '" + arg + "'"
+  # Clone the repository from the current argument
+  if arg.include?("/") # The argument is of the form "user/repo"
+
+    puts "Cloning from '#{arg}'"
     begin
-      if system("git clone https://github.com/" + arg) == nil
+      if system("git clone https://github.com/#{arg}") == nil
         puts GIT_ERROR_MSG
       end
     rescue Interrupt => e
-      puts "\n# WARNING: cloning interrupted."
+      puts "\n*** WARNING: cloning interrupted."
     end
-  else
-    # Prompt for a default GitHub ID if it doesn't exist yet
-    if File.exist?(CONFIG_PATH)
-      github_id = File.read(CONFIG_PATH)
-    else
+
+  else # The argument is of the form "repo" and uses the default GitHub ID
+
+    # If the default GitHub ID doesn't exist yet, ask for it
+    if !File.exist?(CONFIG_PATH)
       puts "No default ID found, please enter a default GitHub ID..."
       github_id = STDIN.gets.chomp
       File.open(CONFIG_PATH, "w") { |f| f.write(github_id) }
-      puts "Default GitHub ID set to: '" + github_id + "'"
+      puts "Default GitHub ID set to: '#{github_id}'"
+    else
+      # Get the default GitHub ID from the config file
+      github_id = File.read(CONFIG_PATH)
     end
-    puts "Cloning from '" + github_id + "/" + arg + "'"
+
+    puts "Cloning from '#{github_id}/#{arg}'"
     begin
-      if system("git clone https://github.com/" + github_id + "/" + arg) == nil
+      if system("git clone https://github.com/#{github_id}/#{arg}") == nil
         puts GIT_ERROR_MSG
       end
     rescue Interrupt => e
-      puts "\n# WARNING: cloning interrupted."
+      puts "\n*** WARNING: cloning interrupted."
     end
+
   end
+
 end
