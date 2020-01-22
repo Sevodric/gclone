@@ -2,7 +2,9 @@
 A minimal "git clone" shortcut written in Ruby.
 
 ## Installation
-To direclty install RClone system-wide, clone this repository (without RClone :p) and use the provided `install.sh` script:
+Dependencies: `git` and `ruby`
+
+To direclty install RClone system-wide, use the provided `install.sh` script:
 ```
 $ git clone https://github.com/Sevodric/rclone && cd rclone/
 $ sh install.sh
