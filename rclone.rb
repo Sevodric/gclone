@@ -4,15 +4,18 @@
 if ARGV.include?("--help") || ARGV.length < 1
   puts "Usage: rclone GITHUB-ID/REPOSITORY...       Use the given GitHub ID"
   puts "       rclone REPOSITORY...                 Use the default GitHub ID"
+  puts "       rclone GITHUB-URL...                 Use the full GitHub URL"
   puts "       rclone --set-default GITHUB-ID       Set the default GitHub ID"
   puts "       rclone --help                        Display this help"
-  puts "\nClone one or more repositories from GitHub"
+  puts "\nQuickly clone one or more repositories from GitHub"
   exit
 end
 
-GIT_ERROR_MSG = "*** ERROR: 'git' nor found.\nConsider checking for correct "  \
-    "installation of the 'git' package. Refer to your distribution's package " \
-    "manager for further installation details."
+GIT_ERROR_MSG = "[ERROR] 'git' nor found.\nConsider checking for correct " \
+  "installation of the 'git' package. Refer to your distribution's package " \
+  "manager for further installation details."
+
+INTERRUPT_MSG = "\n[WARNING] Cloning interrupted."
 
 # The configuration file uses the standard $HOME/.config/ directory and contains
 # nothing more than the default GitHub ID
@@ -33,19 +36,25 @@ ARGV.each_with_index do |arg, index|
   end
 
   # Clone the repository from the current argument
-  if arg.include?("/") # The argument is of the form "user/repo"
-
+  if /https:\/\/github\.com\/[[:ascii:]]+\/[[:ascii:]]+\.git/.match?(arg)
+    puts "cloning from #{arg}"
+    begin
+      if system("git clone #{arg}") == nil
+        puts GIT_ERROR_MSG
+      end
+    rescue Interrupt
+      puts INTERRUPT_MSG
+    end
+  elsif /\A[[:alnum:]]+\/[[:alnum:]]+/.match?(arg)
     puts "Cloning from '#{arg}'"
     begin
       if system("git clone https://github.com/#{arg}") == nil
         puts GIT_ERROR_MSG
       end
-    rescue Interrupt => e
-      puts "\n*** WARNING: cloning interrupted."
+    rescue Interrupt
+      puts INTERRUPT_MSG
     end
-
-  else # The argument is of the form "repo" and uses the default GitHub ID
-
+  else  
     # If the default GitHub ID doesn't exist yet, ask for it
     if !File.exist?(CONFIG_PATH)
       puts "No default ID found, please enter a default GitHub ID..."
@@ -56,16 +65,13 @@ ARGV.each_with_index do |arg, index|
       # Get the default GitHub ID from the config file
       github_id = File.read(CONFIG_PATH)
     end
-
     puts "Cloning from '#{github_id}/#{arg}'"
     begin
       if system("git clone https://github.com/#{github_id}/#{arg}") == nil
         puts GIT_ERROR_MSG
       end
-    rescue Interrupt => e
-      puts "\n*** WARNING: cloning interrupted."
+    rescue Interrupt
+      puts INTERRUPT_MSG
     end
-
   end
-
 end
