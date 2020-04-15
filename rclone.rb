@@ -12,7 +12,7 @@ if ARGV.include?('--help') || ARGV.empty?
   exit
 end
 
-GIT_ERROR_MSG = '[ERROR] `git` nor found. Consider checking for correct ' \
+GIT_ERROR_MSG = '[ERROR] `git` not found. Consider checking for correct ' \
   'installation of the `git` package. Refer to your distribution\'s package ' \
   'manager for further installation details.'
 
