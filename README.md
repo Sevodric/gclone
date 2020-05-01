@@ -1,7 +1,3 @@
-# gclone
-
-A minimal `git clone` shortcut written in Ruby.
-
 ## Installation
 
 Dependencies: `git` and `ruby`
