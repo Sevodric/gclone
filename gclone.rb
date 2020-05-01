@@ -3,11 +3,11 @@
 
 # Displays help if asked and exit
 if ARGV.include?('--help') || ARGV.empty?
-  puts 'Usage: rclone GITHUB-ID/REPOSITORY...       Use the given GitHub ID'
-  puts '       rclone REPOSITORY...                 Use the default GitHub ID'
-  puts '       rclone GITHUB-URL...                 Use the full GitHub URL'
-  puts '       rclone --set-default GITHUB-ID       Set the default GitHub ID'
-  puts '       rclone --help                        Display this help'
+  puts 'Usage: gclone GITHUB-ID/REPOSITORY...       Use the given GitHub ID'
+  puts '       gclone REPOSITORY...                 Use the default GitHub ID'
+  puts '       gclone GITHUB-URL...                 Use a full GitHub URL'
+  puts '       gclone --set-default GITHUB-ID       Set the default GitHub ID'
+  puts '       gclone --help                        Display this help'
   puts 'Quickly clone one or more repositories from GitHub'
   exit
 end
@@ -20,10 +20,10 @@ INTERRUPT_MSG = "\n[WARNING] Cloning interrupted."
 
 # The configuration file uses the standard $HOME/.config/ directory and contains
 # nothing more than the default GitHub ID
-CONFIG_DIR = File.join(Dir.home, '.config', 'rclone')
+CONFIG_DIR = File.join(Dir.home, '.config', 'gclone')
 CONFIG_PATH = File.join(CONFIG_DIR, 'config')
 
-# Ensures the '~/.config/rclone/' directory does exist
+# Ensures the '~/.config/gclone/' directory does exist
 Dir.mkdir(CONFIG_DIR) unless Dir.exist?(CONFIG_DIR)
 
 # Sets the default GitHub ID.

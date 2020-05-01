@@ -1,5 +1,5 @@
 #!/usr/bin/bash
 
-cp rclone.rb rclone
-chmod +x rclone
-sudo mv rclone /usr/bin/rclone
+cp gclone.rb gclone
+chmod +x gclone
+sudo mv gclone /usr/bin/gclone
