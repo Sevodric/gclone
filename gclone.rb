@@ -76,6 +76,7 @@ def retrieve_default_id
     File.open(CONFIG_PATH, 'w') { |f| f.write(github_id) }
     puts "Default GitHub ID set to: '#{github_id}'"
   end
+  github_id
 end
 
 ARGV.each_with_index do |arg, index|
