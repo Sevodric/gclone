@@ -2,12 +2,12 @@
 # frozen_string_literal: true
 
 # Displays help if asked and exit
-if ARGV.include?('--help') || ARGV.empty?
+if ARGV.include?('--help') || ARGV.include?('-h') || ARGV.empty?
   puts 'Usage: gclone GITHUB-ID/REPOSITORY...       Use the given GitHub ID'
   puts '       gclone REPOSITORY...                 Use the default GitHub ID'
   puts '       gclone GITHUB-URL...                 Use a full GitHub URL'
   puts '       gclone --set-default GITHUB-ID       Set the default GitHub ID'
-  puts '       gclone --help                        Display this help'
+  puts '       gclone -h | --help                   Display this help'
   puts 'Quickly clone one or more repositories from GitHub'
   exit
 end
