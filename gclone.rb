@@ -82,7 +82,7 @@ end
 ARGV.each_with_index do |arg, index|
   if arg == '--set-default'
     update_default_id(ARGV[index + 1])
-  elsif %r{https://github\.com/[[:ascii:]]+/[[:ascii:]]+\.git}.match?(arg)
+  elsif %r{https://github\.com/[[:ascii:]]+/[[:ascii:]]+}.match?(arg)
     clone_from_full_link(arg)
   elsif %r{\A[[:alnum:]]+/[[:alnum:]]+}.match?(arg)
     clone_from_couple(arg)
