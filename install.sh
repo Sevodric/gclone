@@ -21,7 +21,7 @@ if [[ $1 == '--local' ]]; then
   privileged=0
 else
   if [[ $EUID -ne 0 ]]; then
-    echo "$0: this script requires root privileges to install dotrs."
+    echo "$0: this script requires root privileges to install $name."
     echo "Run with sudo or use --local."
     exit 1
   fi
