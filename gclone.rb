@@ -12,11 +12,9 @@ if ARGV.include?('--help') || ARGV.include?('-h') || ARGV.empty?
   exit
 end
 
-GIT_ERROR_MSG = '[ERROR] `git` not found. Consider checking for correct ' \
+GIT_ERROR_MSG = 'gclone: `git` not found. Consider checking for correct ' \
   'installation of the `git` package. Refer to your distribution\'s package ' \
   'manager for further installation details.'
-
-INTERRUPT_MSG = "\n[WARNING] Cloning interrupted."
 
 # The configuration file uses the standard $HOME/.config/ directory and contains
 # nothing more than the default GitHub ID
@@ -35,34 +33,22 @@ end
 
 # Clones from a full repo link.
 def clone_from_full_link(link)
-  puts "[INFO] Cloning from #{link}"
-  begin
-    puts GIT_ERROR_MSG if system("git clone #{link}").nil?
-  rescue Interrupt
-    puts INTERRUPT_MSG
-  end
+  puts "gclone: cloning from #{link}"
+  puts GIT_ERROR_MSG if system("git clone #{link}").nil?
 end
 
 # Clones from an argument of the form id/repo.
 def clone_from_couple(arg)
-  puts "[INFO] Cloning from '#{arg}'"
-  begin
-    puts GIT_ERROR_MSG if system("git clone https://github.com/#{arg}").nil?
-  rescue Interrupt
-    puts INTERRUPT_MSG
-  end
+  puts "gclone: cloning from '#{arg}'"
+  puts GIT_ERROR_MSG if system("git clone https://github.com/#{arg}").nil?
 end
 
 # Clones from the default GitHub ID.
 def clone_from_default(repo)
   github_id = retrieve_default_id
-  puts "[INFO] Cloning from '#{github_id}/#{repo}' (default GitHub ID)"
-  begin
-    if system("git clone https://github.com/#{github_id}/#{repo}").nil?
-      puts GIT_ERROR_MSG
-    end
-  rescue Interrupt
-    puts INTERRUPT_MSG
+  puts "gclone: cloning from '#{github_id}/#{repo}' (default GitHub ID)"
+  if system("git clone https://github.com/#{github_id}/#{repo}").nil?
+    puts GIT_ERROR_MSG
   end
 end
 
@@ -72,6 +58,7 @@ def retrieve_default_id
     github_id = File.read(CONFIG_PATH)
   else
     puts 'No default ID found, please enter a default GitHub ID...'
+    printf '>>> '
     github_id = STDIN.gets.chomp
     File.open(CONFIG_PATH, 'w') { |f| f.write(github_id) }
     puts "Default GitHub ID set to: '#{github_id}'"
@@ -80,13 +67,17 @@ def retrieve_default_id
 end
 
 ARGV.each_with_index do |arg, index|
-  if arg == '--set-default'
-    update_default_id(ARGV[index + 1])
-  elsif %r{https://github\.com/[[:ascii:]]+/[[:ascii:]]+}.match?(arg)
-    clone_from_full_link(arg)
-  elsif %r{\A[[:alnum:]]+/[[:alnum:]]+}.match?(arg)
-    clone_from_couple(arg)
-  else
-    clone_from_default(arg)
+  begin
+    if arg == '--set-default'
+      update_default_id(ARGV[index + 1])
+    elsif %r{https://github\.com/[[:ascii:]]+/[[:ascii:]]+}.match?(arg)
+      clone_from_full_link(arg)
+    elsif %r{\A[[:alnum:]]+/[[:alnum:]]+}.match?(arg)
+      clone_from_couple(arg)
+    else
+      clone_from_default(arg)
+    end
+  rescue Interrupt
+    puts "\ndotrs: interrupted!"
   end
 end
